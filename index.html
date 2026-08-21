@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RMLUR :: deux SEXES — beats & kits</title>
+<meta name="description" content="RMLUR Deux Sexes — buy beats and drum kits direct. No middleman.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ================= FACEPLATE HEADER ================= -->
+<header class="faceplate">
+  <div class="faceplate-inner">
+    <div class="brand-block">
+      <div class="brand-badge">RMLUR</div>
+      <div class="brand-sub">deux SEXES</div>
+    </div>
+
+    <!-- LCD -->
+    <div class="lcd" aria-hidden="false">
+      <div class="lcd-row lcd-scroll"><span id="lcd-marquee">RMLUR DEUX SEXES ▪ BEATS + KITS DIRECT ▪ NO MIDDLEMAN ▪ INSTANT DELIVERY ▪ </span></div>
+      <div class="lcd-row lcd-status">
+        <span id="lcd-now">READY.</span>
+        <span id="lcd-time">00:00</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <a class="hard-link" href="mailto:jayrewindbeatz@gmail.com">CONTACT</a>
+      <a class="hard-link" href="https://www.youtube.com/" target="_blank" rel="noopener">YOUTUBE</a>
+      <a class="hard-link" href="https://www.instagram.com/kennethglamour/" target="_blank" rel="noopener">IG</a>
+    </div>
+  </div>
+
+  <!-- F-KEY FILTER ROW -->
+  <nav class="fkeys" aria-label="Filter products">
+    <button class="fkey active" data-filter="all"><span class="fkey-label">F1</span>ALL</button>
+    <button class="fkey" data-filter="beat"><span class="fkey-label">F2</span>BEATS</button>
+    <button class="fkey" data-filter="kit"><span class="fkey-label">F3</span>KITS</button>
+    <a class="fkey fkey-link" href="mailto:jayrewindbeatz@gmail.com?subject=Custom%20work"><span class="fkey-label">F4</span>CUSTOM</a>
+  </nav>
+</header>
+
+<!-- ================= PAD GRID ================= -->
+<main>
+  <section class="grid-wrap">
+    <div id="pad-grid" class="pad-grid"><!-- products injected here --></div>
+    <p id="empty-state" class="empty-state" hidden>NO FILES IN BANK. LOAD SOUND?</p>
+  </section>
+</main>
+
+<!-- ================= TRANSPORT / PLAYER BAR ================= -->
+<div id="player-bar" class="player-bar" hidden>
+  <button id="pb-play" class="transport-btn" aria-label="Play or pause preview">►</button>
+  <button id="pb-stop" class="transport-btn" aria-label="Stop preview">■</button>
+  <div class="pb-lcd">
+    <span id="pb-title">—</span>
+    <div class="pb-meter"><div id="pb-progress"></div></div>
+  </div>
+  <a id="pb-buy" class="buy-btn buy-btn-sm" href="#" target="_blank" rel="noopener">BUY</a>
+</div>
+
+<footer class="site-footer">
+  <span>𝄃𝄃𝄂𝄂𝄀𝄁𝄃𝄂𝄂𝄃</span>
+  <span>© RMLUR — all sales final ▪ files delivered instantly after checkout</span>
+  <span>email :: jayrewindbeatz@gmail.com</span>
+</footer>
+
+<audio id="preview-audio"></audio>
+<script src="products.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
