@@ -1,0 +1,249 @@
+/* ============================================================
+   RMLUR STORE — MPC2000XL design system
+   faceplate charcoal / cream plastic keys / green LCD / red REC
+   ============================================================ */
+:root{
+  --faceplate:#232325;
+  --faceplate-deep:#1a1a1c;
+  --panel:#2c2c2f;
+  --cream:#d9d4c5;
+  --cream-dim:#b8b3a4;
+  --lcd-bg:#16240f;
+  --lcd-green:#a4e04a;
+  --lcd-green-dim:#5d8030;
+  --rec-red:#c8322b;
+  --pad-gray:#39393c;
+  --line:#3f3f43;
+  --font-display:'Chakra Petch',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--faceplate-deep);
+  color:var(--cream);
+  font-family:var(--font-display);
+  min-height:100vh;
+  background-image:
+    radial-gradient(ellipse at 50% -20%, #2e2e31 0%, transparent 60%),
+    repeating-linear-gradient(0deg, transparent 0 2px, rgba(255,255,255,.008) 2px 4px);
+}
+button{font-family:inherit;cursor:pointer}
+a{color:inherit}
+
+/* ================= HEADER ================= */
+.faceplate{
+  background:var(--faceplate);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 4px 24px rgba(0,0,0,.5);
+  position:sticky;top:0;z-index:50;
+}
+.faceplate-inner{
+  max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;gap:24px;
+  padding:16px 24px 10px;
+}
+.brand-block{flex-shrink:0}
+.brand-badge{
+  font-weight:700;font-size:22px;letter-spacing:.14em;
+  color:var(--faceplate-deep);
+  background:var(--cream);
+  padding:2px 10px;border-radius:3px;
+  display:inline-block;
+}
+.brand-sub{
+  font-family:var(--font-mono);
+  font-size:11px;letter-spacing:.34em;color:var(--cream-dim);
+  margin-top:4px;padding-left:2px;
+}
+
+/* LCD */
+.lcd{
+  flex:1;min-width:0;
+  background:var(--lcd-bg);
+  border:2px solid #0d1508;
+  border-radius:4px;
+  box-shadow:inset 0 2px 10px rgba(0,0,0,.7), 0 0 0 3px #333336, 0 1px 0 #4a4a4e;
+  padding:8px 12px;
+  font-family:var(--font-mono);
+  color:var(--lcd-green);
+  text-shadow:0 0 6px rgba(164,224,74,.45);
+  overflow:hidden;
+  position:relative;
+}
+.lcd::after{ /* scanlines */
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg, transparent 0 2px, rgba(0,0,0,.14) 2px 3px);
+}
+.lcd-row{white-space:nowrap;overflow:hidden}
+.lcd-scroll span{
+  display:inline-block;
+  animation:marquee 18s linear infinite;
+  font-size:14px;letter-spacing:.12em;
+}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.lcd-status{
+  display:flex;justify-content:space-between;
+  font-size:11px;color:var(--lcd-green-dim);margin-top:2px;letter-spacing:.1em;
+}
+.header-right{display:flex;gap:14px;flex-shrink:0}
+.hard-link{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;
+  text-decoration:none;color:var(--cream-dim);
+  border-bottom:1px solid transparent;padding-bottom:2px;
+}
+.hard-link:hover{color:var(--cream);border-color:var(--rec-red)}
+
+/* F-KEYS */
+.fkeys{
+  max-width:1200px;margin:0 auto;
+  display:flex;gap:10px;padding:0 24px 14px;
+}
+.fkey{
+  background:linear-gradient(180deg,#e3ded0,#c9c4b4);
+  color:#2a2a2c;
+  border:none;border-radius:3px;
+  padding:7px 18px 8px;
+  font-weight:600;font-size:12px;letter-spacing:.14em;
+  box-shadow:0 3px 0 #8f8a7b, 0 4px 6px rgba(0,0,0,.4);
+  display:flex;align-items:center;gap:8px;
+  text-decoration:none;
+  transition:transform .05s, box-shadow .05s;
+}
+.fkey:hover{filter:brightness(1.05)}
+.fkey:active, .fkey.active{
+  transform:translateY(2px);
+  box-shadow:0 1px 0 #8f8a7b, 0 2px 3px rgba(0,0,0,.4);
+}
+.fkey.active{outline:2px solid var(--rec-red);outline-offset:1px}
+.fkey-label{
+  font-family:var(--font-mono);font-size:10px;color:#6d6a5f;font-weight:500;
+}
+
+/* ================= PAD GRID ================= */
+.grid-wrap{max-width:1200px;margin:0 auto;padding:36px 24px 120px}
+.pad-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:22px;
+}
+.pad{
+  background:var(--pad-gray);
+  border-radius:8px;
+  border:1px solid #46464a;
+  box-shadow:0 6px 0 #202022, 0 10px 18px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+  overflow:hidden;
+  transition:transform .07s, box-shadow .07s;
+  display:flex;flex-direction:column;
+}
+.pad:hover{transform:translateY(2px);box-shadow:0 4px 0 #202022, 0 6px 12px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06)}
+.pad.playing{outline:2px solid var(--lcd-green);outline-offset:2px}
+
+.pad-cover{
+  position:relative;aspect-ratio:1/1;background:#151517;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.pad-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.pad-cover .cover-fallback{
+  font-family:var(--font-mono);color:var(--lcd-green);
+  font-size:12px;letter-spacing:.2em;text-align:center;line-height:2;
+  text-shadow:0 0 8px rgba(164,224,74,.5);
+}
+.pad-play{
+  position:absolute;inset:auto 10px 10px auto;
+  width:44px;height:44px;border-radius:50%;
+  border:none;
+  background:linear-gradient(180deg,#e3ded0,#c9c4b4);
+  color:#2a2a2c;font-size:16px;
+  box-shadow:0 3px 0 #8f8a7b, 0 4px 8px rgba(0,0,0,.6);
+  transition:transform .05s, box-shadow .05s;
+}
+.pad-play:active{transform:translateY(2px);box-shadow:0 1px 0 #8f8a7b}
+.pad.playing .pad-play{background:linear-gradient(180deg,#b8e86a,#8fc23e);}
+
+.pad-meta{padding:14px 14px 6px}
+.pad-type{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.28em;
+  color:var(--cream-dim);
+}
+.pad-type .dot{color:var(--rec-red)}
+.pad-title{font-size:17px;font-weight:700;letter-spacing:.06em;margin-top:3px}
+.pad-sub{font-size:12px;color:var(--cream-dim);margin-top:2px;letter-spacing:.04em}
+.pad-data{
+  font-family:var(--font-mono);font-size:11px;color:var(--lcd-green);
+  background:var(--lcd-bg);
+  border-radius:3px;padding:4px 8px;margin-top:10px;
+  display:inline-block;letter-spacing:.1em;
+  text-shadow:0 0 5px rgba(164,224,74,.4);
+}
+.pad-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px 16px;margin-top:auto;
+}
+.pad-price{font-family:var(--font-mono);font-size:15px;font-weight:600}
+.buy-btn{
+  background:linear-gradient(180deg,#d8443c,var(--rec-red));
+  color:#fff;text-decoration:none;
+  font-weight:700;font-size:12px;letter-spacing:.18em;
+  padding:9px 20px;border-radius:4px;
+  box-shadow:0 3px 0 #7e1f1a, 0 5px 10px rgba(0,0,0,.5);
+  transition:transform .05s, box-shadow .05s;
+}
+.buy-btn:hover{filter:brightness(1.08)}
+.buy-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #7e1f1a}
+.empty-state{
+  font-family:var(--font-mono);color:var(--lcd-green-dim);
+  text-align:center;padding:80px 0;letter-spacing:.2em;
+}
+
+/* ================= PLAYER BAR ================= */
+.player-bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  background:var(--faceplate);
+  border-top:1px solid var(--line);
+  box-shadow:0 -6px 24px rgba(0,0,0,.55);
+  display:flex;align-items:center;gap:14px;
+  padding:12px 20px;
+  max-width:100%;
+}
+.transport-btn{
+  width:46px;height:38px;border:none;border-radius:4px;
+  background:linear-gradient(180deg,#e3ded0,#c9c4b4);
+  color:#2a2a2c;font-size:14px;
+  box-shadow:0 3px 0 #8f8a7b;
+}
+.transport-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #8f8a7b}
+.pb-lcd{
+  flex:1;min-width:0;
+  background:var(--lcd-bg);border-radius:4px;
+  padding:7px 12px;
+  font-family:var(--font-mono);color:var(--lcd-green);
+  text-shadow:0 0 5px rgba(164,224,74,.4);
+}
+#pb-title{font-size:12px;letter-spacing:.12em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.pb-meter{height:5px;background:#0d1508;border-radius:2px;margin-top:5px;overflow:hidden}
+#pb-progress{height:100%;width:0%;background:var(--lcd-green);box-shadow:0 0 6px rgba(164,224,74,.6)}
+.buy-btn-sm{padding:9px 18px;flex-shrink:0}
+
+/* ================= FOOTER ================= */
+.site-footer{
+  max-width:1200px;margin:0 auto;
+  padding:30px 24px 60px;
+  display:flex;flex-direction:column;gap:8px;align-items:center;
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;
+  color:var(--cream-dim);text-align:center;
+}
+
+/* ================= RESPONSIVE / A11Y ================= */
+@media(max-width:760px){
+  .faceplate-inner{flex-wrap:wrap;gap:12px}
+  .header-right{display:none}
+  .lcd{width:100%;flex-basis:100%}
+  .pad-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+  .pad-title{font-size:14px}
+}
+:focus-visible{outline:2px solid var(--lcd-green);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){
+  .lcd-scroll span{animation:none}
+  *{transition:none !important}
+}
