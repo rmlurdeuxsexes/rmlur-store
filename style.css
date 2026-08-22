@@ -314,6 +314,18 @@ main#shop{max-width:1280px;margin:0 auto;padding:60px 32px 160px}
   font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
   color:#bbb;
 }
+.design-item{
+  aspect-ratio:3/4;background:#f4f4f4;overflow:hidden;
+}
+.design-item img, .design-item video{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+.design-item-wide{
+  grid-column:span 2;aspect-ratio:16/8;
+}
+@media(max-width:640px){
+  .design-item-wide{grid-column:span 1;aspect-ratio:3/4}
+}
 @media(max-width:640px){
   .corner-nav{display:none}
   .hero{padding:36px 14px 18px}
