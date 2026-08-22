@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const pbTitle = document.getElementById('pb-title');
   const pbBuy = document.getElementById('pb-buy');
   const pbProgress = document.getElementById('pb-progress');
+  const pbWave = document.getElementById('pb-wave');
+  const waveCtx = pbWave ? pbWave.getContext('2d') : null;
 
   const hcCard = document.getElementById('hotspot-card');
   const hcClose = document.getElementById('hc-close');
@@ -36,8 +38,55 @@ document.addEventListener('DOMContentLoaded', () => {
   async function safePlay(src) {
     await safeStop();
     if (src && audio.src !== src) audio.src = src;
+    ensureVisualizer();
     playPromise = audio.play();
     try { await playPromise; } catch (_) {}
+    startWave();
+  }
+
+  /* ---------- pixel LCD waveform, driven by Web Audio ---------- */
+  let audioCtx = null, analyser = null, waveData = null, waveRAF = null;
+  function ensureVisualizer() {
+    if (audioCtx || !waveCtx) return;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioCtx.createMediaElementSource(audio);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 64;
+      waveData = new Uint8Array(analyser.frequencyBinCount);
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+    } catch (_) { /* visualizer is optional, playback still works without it */ }
+  }
+  function drawWave() {
+    if (!waveCtx) return;
+    const w = pbWave.width, h = pbWave.height;
+    waveCtx.clearRect(0, 0, w, h);
+    if (analyser && !audio.paused) {
+      analyser.getByteFrequencyData(waveData);
+    }
+    const bars = 16;
+    const gap = 2;
+    const barW = Math.floor((w - gap * (bars - 1)) / bars);
+    for (let i = 0; i < bars; i++) {
+      let v = 6;
+      if (analyser && !audio.paused) {
+        const idx = Math.floor((i / bars) * waveData.length);
+        v = Math.max(3, Math.round((waveData[idx] / 255) * h));
+      }
+      const x = i * (barW + gap);
+      const y = h - v;
+      waveCtx.fillStyle = '#8fe0d2';
+      waveCtx.fillRect(x, y, barW, v);
+    }
+    waveRAF = requestAnimationFrame(drawWave);
+  }
+  function startWave() {
+    if (!waveRAF) drawWave();
+  }
+  function stopWave() {
+    if (waveRAF) { cancelAnimationFrame(waveRAF); waveRAF = null; }
+    if (waveCtx) waveCtx.clearRect(0, 0, pbWave.width, pbWave.height);
   }
 
   function dataBits(p) {
@@ -133,6 +182,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.tape-card').forEach(el => {
       el.classList.toggle('playing', el.dataset.id === currentId && !audio.paused);
     });
+    playerBar.classList.toggle('paused', audio.paused);
+    if (audio.paused) stopWave();
     syncHcPlayLabel();
   }
 
