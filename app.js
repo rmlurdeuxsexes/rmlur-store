@@ -178,5 +178,26 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   renderHotspots();
+  renderLcdHotspot();
   renderGrid();
+
+  /* ---------- LCD screen — click to jump straight to the shop ---------- */
+  function renderLcdHotspot() {
+    const pos = hotspotMap['lcd'];
+    if (!pos) return;
+    const el = document.createElement('div');
+    el.className = 'hotspot lcd-hotspot';
+    el.style.left = pos.left + '%';
+    el.style.top = pos.top + '%';
+    el.style.width = pos.width + '%';
+    el.style.height = pos.height + '%';
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('aria-label', 'Jump to the shop');
+    el.innerHTML = '<span class="lcd-marquee">► SHOP BEATS ► SHOP KITS ► </span>';
+    const jump = () => document.getElementById('shop').scrollIntoView({ behavior: 'smooth' });
+    el.addEventListener('click', jump);
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') jump(); });
+    heroHotspots.appendChild(el);
+  }
 });

@@ -64,9 +64,10 @@ window.PRODUCTS = [
    Add a new pad-r-c entry here if you map a new product to a pad.
    ============================================================ */
 window.HERO_HOTSPOTS = {
-  "pad-0-0": { left: 59.5, top: 27.8, width: 9.2, height: 8.7 },
-  "pad-0-1": { left: 68.7, top: 27.8, width: 9.2, height: 8.7 },
-  "pad-0-2": { left: 77.9, top: 27.8, width: 9.2, height: 8.7 },
-  "pad-0-3": { left: 87.1, top: 27.8, width: 9.2, height: 8.7 },
-  "tape":    { left: 20.8, top: 69.3, width: 17.6, height: 26.4 }
+  "pad-0-0": { left: 59.5, top: 25.3, width: 9.2, height: 9.0 },
+  "pad-0-1": { left: 68.7, top: 25.3, width: 9.2, height: 9.0 },
+  "pad-0-2": { left: 77.9, top: 25.3, width: 9.2, height: 9.0 },
+  "pad-0-3": { left: 87.1, top: 25.3, width: 9.2, height: 9.0 },
+  "tape":    { left: 20.8, top: 68.2, width: 17.6, height: 27.3 },
+  "lcd":     { left: 7.0,  top: 1.2,  width: 38.4, height: 9.6 }
 };
