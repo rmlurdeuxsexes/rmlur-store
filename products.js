@@ -2,7 +2,12 @@
    RMLUR STORE — PRODUCT CATALOG
    ============================================================
    To add a new beat or kit:
-   1. Drop cover art into  assets/   (jpg or png)
+   1. Upload the beat's video to YouTube and set its thumbnail there.
+      Then set "youtubeId" below to that video's ID (the part after
+      watch?v= in the URL) — the cover art will pull that thumbnail
+      automatically, so you never have to upload a separate cover image.
+      Leave youtubeId null and put a real file path in "cover" instead
+      if a product has no YouTube video yet.
    2. Drop mp3 preview into  previews/      (tagged preview!)
    3. Copy one of the blocks below, edit it, done.
    4. Push to GitHub → site updates automatically.
@@ -28,6 +33,7 @@ window.PRODUCTS = [
     bars: 32,
     genre: "Trap / Boom Bap",
     cover: "assets/midnight-pager.jpg",
+    youtubeId: null,   // e.g. "dQw4w9WgXcQ" — cover art will pull that video's YouTube thumbnail
     preview: "previews/midnight-pager.mp3",
     tags: ["dark", "boom bap", "vinyl"],
     hotspot: "tape",
@@ -49,6 +55,7 @@ window.PRODUCTS = [
     bars: null,
     genre: "Drum Kit",
     cover: "assets/deux-sexes-drums-v1.jpg",
+    youtubeId: null,
     preview: "previews/deux-sexes-drums-v1.mp3",
     tags: ["drum kit", "one shots", "12-bit"],
     hotspot: "pad-0-1",
@@ -70,6 +77,7 @@ window.PRODUCTS = [
     bars: 16,
     genre: "Soul / R&B",
     cover: "assets/getty-tape.jpg",
+    youtubeId: null,
     preview: "previews/getty-tape.mp3",
     tags: ["soul", "sample", "chops"],
     hotspot: "pad-0-2",

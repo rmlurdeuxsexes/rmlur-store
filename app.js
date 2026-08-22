@@ -25,6 +25,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const prices = (p.tiers || []).map(t => t.price);
     return prices.length ? Math.min(...prices) : 0;
   }
+  /* If a product has a youtubeId, use that video's real YouTube thumbnail
+     as the cover art (so uploading to YouTube is the only place you ever
+     have to set the artwork). Falls back to the local cover file otherwise. */
+  function coverUrl(p) {
+    return p.youtubeId
+      ? `https://img.youtube.com/vi/${p.youtubeId}/maxresdefault.jpg`
+      : p.cover;
+  }
+  function coverFallbackUrl(p) {
+    // maxresdefault.jpg 404s on some videos — hqdefault always exists
+    return p.youtubeId ? `https://img.youtube.com/vi/${p.youtubeId}/hqdefault.jpg` : '';
+  }
+  // shared <img onerror> handler: YouTube maxres -> YouTube hqdefault -> local cover file -> text fallback
+  window.__coverErr = function (img) {
+    const stage = parseInt(img.dataset.stage || '0', 10);
+    if (stage === 0 && img.dataset.ytId) {
+      img.dataset.stage = '1';
+      img.src = `https://img.youtube.com/vi/${img.dataset.ytId}/hqdefault.jpg`;
+      return;
+    }
+    if (stage <= 1 && img.dataset.local) {
+      img.dataset.stage = '2';
+      img.src = img.dataset.local;
+      return;
+    }
+    img.remove();
+    if (img.parentElement) {
+      img.parentElement.insertAdjacentHTML('afterbegin', '<div class="cover-fallback">RMLUR<br>deux SEXES</div>');
+    }
+  };
   function dataBits(p) {
     const bits = [];
     if (p.bpm) bits.push(p.bpm + ' BPM');
@@ -123,7 +153,11 @@ document.addEventListener('DOMContentLoaded', () => {
     opts = opts || {};
     pdpProduct = p;
     pdpSelectedTier = null;
-    pdpCover.src = p.cover;
+    pdpCover.src = coverUrl(p);
+    pdpCover.dataset.stage = '0';
+    pdpCover.dataset.ytId = p.youtubeId || '';
+    pdpCover.dataset.local = p.cover || '';
+    pdpCover.onerror = () => window.__coverErr(pdpCover);
     pdpCover.alt = p.title + ' cover art';
     pdpTitleC.textContent = p.title;
     pdpPriceC.textContent = 'FROM $' + minPrice(p).toFixed(2);
@@ -258,8 +292,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       card.innerHTML = `
         <div class="tc-cover">
-          <img src="${p.cover}" alt="${p.title} cover art" loading="lazy"
-               onerror="this.remove(); this.parentElement.insertAdjacentHTML('afterbegin','<div class=&quot;cover-fallback&quot;>RMLUR<br>deux SEXES</div>')">
+          <img src="${coverUrl(p)}" alt="${p.title} cover art" loading="lazy"
+               data-stage="0" data-yt-id="${p.youtubeId || ''}" data-local="${p.cover || ''}"
+               onerror="window.__coverErr(this)">
           <button class="tc-play" aria-label="Preview ${p.title}">►</button>
         </div>
         <div class="tc-type">${p.type === 'kit' ? 'DRUM KIT' : 'BEAT'}</div>
