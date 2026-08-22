@@ -16,18 +16,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const pbWave = document.getElementById('pb-wave');
   const waveCtx = pbWave ? pbWave.getContext('2d') : null;
 
-  const hcCard = document.getElementById('hotspot-card');
-  const hcClose = document.getElementById('hc-close');
-  const hcType = document.getElementById('hc-type');
-  const hcTitle = document.getElementById('hc-title');
-  const hcSub = document.getElementById('hc-sub');
-  const hcData = document.getElementById('hc-data');
-  const hcPlay = document.getElementById('hc-play');
-  const hcPrice = document.getElementById('hc-price');
-  const hcBuy = document.getElementById('hc-buy');
-
   let currentId = null;
   let filter = 'all';
+  let cartCount = 0;
+
+  /* ---------- helpers ---------- */
+  function minPrice(p) {
+    const prices = (p.tiers || []).map(t => t.price);
+    return prices.length ? Math.min(...prices) : 0;
+  }
+  function dataBits(p) {
+    const bits = [];
+    if (p.bpm) bits.push(p.bpm + ' BPM');
+    if (p.key) bits.push(p.key);
+    if (p.tags && p.tags.length) bits.push(p.tags[0]);
+    return bits.join(' ▪ ');
+  }
 
   /* ---------- safeStop: never interrupt play() ---------- */
   let playPromise = Promise.resolve();
@@ -77,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const idx = Math.floor((i / bars) * waveData.length);
         v = Math.max(3, Math.round((waveData[idx] / 255) * h));
       } else {
-        // idle "breathing" animation so the LCD reads as alive before real audio data exists
         v = Math.max(3, Math.round(5 + Math.sin(t + i * 0.6) * 4));
       }
       const x = i * (barW + gap);
@@ -87,21 +90,138 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     waveRAF = requestAnimationFrame(drawWave);
   }
-  function startWave() {
-    if (!waveRAF) drawWave();
-  }
+  function startWave() { if (!waveRAF) drawWave(); }
   function stopWave() {
     if (waveRAF) { cancelAnimationFrame(waveRAF); waveRAF = null; }
     if (waveCtx) waveCtx.clearRect(0, 0, pbWave.width, pbWave.height);
   }
 
-  function dataBits(p) {
-    const bits = [];
-    if (p.bpm) bits.push(p.bpm + ' BPM');
-    if (p.key) bits.push(p.key);
-    if (p.tags && p.tags.length) bits.push(p.tags[0]);
-    return bits.join(' ▪ ');
+  /* ================= PRODUCT DETAIL OVERLAY ================= */
+  const pdp = document.getElementById('pdp-overlay');
+  const pdpBack = document.getElementById('pdp-back');
+  const pdpCartCount = document.getElementById('pdp-cart-count');
+  const pdpCover = document.getElementById('pdp-cover');
+  const pdpPlay = document.getElementById('pdp-play');
+  const pdpCollapsed = document.getElementById('pdp-collapsed');
+  const pdpExpanded = document.getElementById('pdp-expanded');
+  const pdpTitleC = document.getElementById('pdp-title-c');
+  const pdpPriceC = document.getElementById('pdp-price-c');
+  const pdpExpand = document.getElementById('pdp-expand');
+  const pdpStatus = document.getElementById('pdp-status');
+  const pdpCloseX = document.getElementById('pdp-close-x');
+  const pdpInfoQ = document.getElementById('pdp-info-q');
+  const pdpPrice = document.getElementById('pdp-price');
+  const pdpTiers = document.getElementById('pdp-tiers');
+  const pdpExclusiveBtn = document.getElementById('pdp-exclusive');
+  const pdpInfoToggle = document.getElementById('pdp-info-toggle');
+  const pdpInfoPanel = document.getElementById('pdp-info-panel');
+
+  let pdpProduct = null;
+  let pdpSelectedTier = null;
+
+  function openPDP(p, opts) {
+    opts = opts || {};
+    pdpProduct = p;
+    pdpSelectedTier = null;
+    pdpCover.src = p.cover;
+    pdpCover.alt = p.title + ' cover art';
+    pdpTitleC.textContent = p.title;
+    pdpPriceC.textContent = 'FROM $' + minPrice(p).toFixed(2);
+    pdpStatus.textContent = 'SELECT FORMAT';
+    pdpStatus.classList.remove('flash');
+    pdpInfoPanel.hidden = true;
+    renderTiers(p);
+    pdp.hidden = false;
+    document.body.style.overflow = 'hidden';
+    if (opts.expanded) {
+      pdpCollapsed.hidden = true;
+      pdpExpanded.hidden = false;
+    } else {
+      pdpCollapsed.hidden = false;
+      pdpExpanded.hidden = true;
+    }
   }
+  function closePDP() {
+    pdp.hidden = true;
+    document.body.style.overflow = '';
+    pdpProduct = null;
+  }
+  function renderTiers(p) {
+    pdpTiers.innerHTML = '';
+    (p.tiers || []).forEach(t => {
+      const btn = document.createElement('button');
+      btn.className = 'pdp-tier';
+      btn.dataset.tierId = t.id;
+      btn.innerHTML = `${t.label}<span class="tier-price">$${t.price.toFixed(2)}</span>`;
+      btn.addEventListener('click', () => selectTier(p, t));
+      pdpTiers.appendChild(btn);
+    });
+    if (p.exclusive) {
+      pdpExclusiveBtn.hidden = false;
+      pdpExclusiveBtn.textContent = `EXCLUSIVE RIGHTS — $${p.exclusive.price.toFixed(2)}`;
+      pdpExclusiveBtn.onclick = () => selectTier(p, { id: 'exclusive', label: 'EXCLUSIVE', price: p.exclusive.price, stripeLink: p.exclusive.stripeLink });
+    } else {
+      pdpExclusiveBtn.hidden = true;
+    }
+  }
+  function selectTier(p, tier) {
+    pdpSelectedTier = tier;
+    document.querySelectorAll('.pdp-tier').forEach(el => {
+      el.classList.toggle('selected', el.dataset.tierId === tier.id);
+    });
+    pdpStatus.textContent = 'ADDING';
+    pdpStatus.classList.add('flash');
+    setTimeout(() => {
+      pdpStatus.classList.remove('flash');
+      pdpStatus.textContent = tier.label + ' ADDED';
+      cartCount++;
+      pdpCartCount.textContent = cartCount;
+      showBuyButton(p, tier);
+    }, 700);
+  }
+  function showBuyButton(p, tier) {
+    let btn = document.getElementById('pdp-buy-link');
+    if (!btn) {
+      btn = document.createElement('a');
+      btn.id = 'pdp-buy-link';
+      btn.className = 'buy-btn pdp-buy-btn';
+      btn.target = '_blank';
+      btn.rel = 'noopener';
+      pdpInfoToggle.insertAdjacentElement('beforebegin', btn);
+    }
+    btn.href = tier.stripeLink;
+    btn.textContent = `BUY ${tier.label} — $${tier.price.toFixed(2)}`;
+  }
+
+  pdpExpand.addEventListener('click', () => {
+    pdpCollapsed.hidden = true;
+    pdpExpanded.hidden = false;
+  });
+  pdpCloseX.addEventListener('click', () => {
+    pdpExpanded.hidden = true;
+    pdpCollapsed.hidden = false;
+    const btn = document.getElementById('pdp-buy-link');
+    if (btn) btn.remove();
+  });
+  pdpBack.addEventListener('click', closePDP);
+  pdpInfoQ.addEventListener('click', () => toggleInfo());
+  pdpInfoToggle.addEventListener('click', () => toggleInfo());
+  function toggleInfo() {
+    if (!pdpProduct) return;
+    const willShow = pdpInfoPanel.hidden;
+    pdpInfoPanel.hidden = !willShow;
+    if (willShow) {
+      const p = pdpProduct;
+      const meta = [];
+      if (p.bpm) meta.push(['BPM', p.bpm]);
+      if (p.key) meta.push(['KEY', p.key]);
+      if (p.bars) meta.push(['BARS', p.bars]);
+      if (p.genre) meta.push(['GENRE', p.genre]);
+      const metaHtml = meta.map(([k, v]) => `<div><span class="k">${k}</span><span class="v">${v}</span></div>`).join('');
+      pdpInfoPanel.innerHTML = `<div class="pdp-info-meta">${metaHtml}</div><p>${p.info || ''}</p>`;
+    }
+  }
+  pdpPlay.addEventListener('click', () => { if (pdpProduct) togglePreview(pdpProduct); });
 
   /* ---------- hero hotspots ---------- */
   function renderHotspots() {
@@ -117,38 +237,11 @@ document.addEventListener('DOMContentLoaded', () => {
       el.style.height = pos.height + '%';
       el.setAttribute('role', 'button');
       el.setAttribute('tabindex', '0');
-      el.setAttribute('aria-label', 'Preview ' + p.title);
-      el.addEventListener('click', () => openHotspotCard(p));
-      el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openHotspotCard(p); });
+      el.setAttribute('aria-label', 'View ' + p.title);
+      el.addEventListener('click', () => openPDP(p));
+      el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openPDP(p); });
       heroHotspots.appendChild(el);
     });
-  }
-
-  function openHotspotCard(p) {
-    hcType.textContent = p.type === 'kit' ? 'DRUM KIT' : 'BEAT';
-    hcTitle.textContent = p.title;
-    hcSub.textContent = p.subtitle || '';
-    const bits = dataBits(p);
-    hcData.style.display = bits ? 'inline-block' : 'none';
-    hcData.textContent = bits;
-    hcPrice.textContent = '$' + p.price.toFixed(2);
-    hcBuy.href = p.stripeLink;
-    hcPlay.dataset.id = p.id;
-    hcCard.hidden = false;
-    hcCard.dataset.id = p.id;
-    syncHcPlayLabel();
-  }
-  hcClose.addEventListener('click', () => { hcCard.hidden = true; });
-  hcPlay.addEventListener('click', async () => {
-    const id = hcCard.dataset.id;
-    const p = products.find(x => x.id === id);
-    if (!p) return;
-    await togglePreview(p);
-    syncHcPlayLabel();
-  });
-  function syncHcPlayLabel() {
-    const playing = currentId === hcCard.dataset.id && !audio.paused;
-    hcPlay.textContent = playing ? '■ pause' : '► preview';
   }
 
   /* ---------- shop grid ---------- */
@@ -174,11 +267,17 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="tc-sub">${p.subtitle || ''}</div>
         ${bits ? `<span class="tc-data">${bits}</span>` : ''}
         <div class="tc-foot">
-          <span class="tc-price">$${p.price.toFixed(2)}</span>
-          <a class="buy-btn" href="${p.stripeLink}" target="_blank" rel="noopener">BUY</a>
+          <span class="tc-price">FROM $${minPrice(p).toFixed(2)}</span>
+          <button class="buy-btn tc-buy">BUY</button>
         </div>`;
 
       card.querySelector('.tc-play').addEventListener('click', () => togglePreview(p));
+      card.querySelector('.tc-cover').addEventListener('click', (e) => {
+        if (e.target.closest('.tc-play')) return;
+        openPDP(p);
+      });
+      card.querySelector('.tc-title').addEventListener('click', () => openPDP(p));
+      card.querySelector('.tc-buy').addEventListener('click', () => openPDP(p, { expanded: true }));
       tapeGrid.appendChild(card);
     });
     markPlaying();
@@ -188,8 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.tape-card').forEach(el => {
       el.classList.toggle('playing', el.dataset.id === currentId && !audio.paused);
     });
-    if (waveCtx) { /* keep the LCD alive regardless of actual audio load state */ }
-    syncHcPlayLabel();
   }
 
   /* ---------- preview player ---------- */
@@ -199,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       currentId = p.id;
       pbTitle.textContent = `${p.title} — ${p.subtitle || (p.type === 'kit' ? 'drum kit' : 'beat')}`;
-      pbBuy.href = p.stripeLink;
+      pbBuy.href = (p.tiers && p.tiers[0]) ? p.tiers[0].stripeLink : '#';
       playerBar.hidden = false;
       startWave();
       await safePlay(p.preview);
@@ -234,10 +331,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  renderHotspots();
-  renderLcdHotspot();
-  renderGrid();
-
   /* ---------- LCD screen — click to jump straight to the shop ---------- */
   function renderLcdHotspot() {
     const pos = hotspotMap['lcd'];
@@ -257,4 +350,8 @@ document.addEventListener('DOMContentLoaded', () => {
     el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') jump(); });
     heroHotspots.appendChild(el);
   }
+
+  renderHotspots();
+  renderLcdHotspot();
+  renderGrid();
 });

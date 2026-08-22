@@ -106,48 +106,116 @@ a{color:inherit;text-decoration:none}
 }
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
 
-/* ================= HOTSPOT POPOVER ================= */
-.hotspot-card{
-  position:fixed;
-  left:50%;bottom:100px;
-  transform:translateX(-50%);
-  width:min(320px,90vw);
+/* ================= PRODUCT DETAIL OVERLAY (Yeezy-style) ================= */
+.pdp-overlay{
+  position:fixed;inset:0;z-index:100;
   background:#fff;
-  border:1px solid #e2e2e2;
-  border-radius:0;
-  box-shadow:0 16px 40px rgba(0,0,0,.14);
-  padding:18px 20px 20px;
-  z-index:80;
+  overflow-y:auto;
+  animation:pdp-in .18s ease;
 }
-.hc-close{
-  position:absolute;top:10px;right:12px;
-  font-size:16px;color:var(--ink-soft);line-height:1;
+@keyframes pdp-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.pdp-topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 24px;
 }
-.hc-close:hover{color:var(--ink)}
-.hc-type{
-  font-family:var(--font-mono);
-  font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);
+.pdp-back{font-size:22px;color:var(--ink);line-height:1}
+.pdp-back:hover{opacity:.6}
+.pdp-cart{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--font-mono);font-size:13px;color:var(--ink);
 }
-.hc-title{
+.pdp-body{max-width:520px;margin:0 auto;padding:0 24px 80px;text-align:center}
+.pdp-image{
+  position:relative;
+  aspect-ratio:1/1;background:#f4f4f4;
+  margin-top:20px;
+}
+.pdp-image img{width:100%;height:100%;object-fit:cover;display:block}
+.pdp-play{
+  position:absolute;right:14px;bottom:14px;
+  width:38px;height:38px;border-radius:50%;
+  background:#fff;border:1px solid #ddd;font-size:13px;
+}
+.pdp-panel{margin-top:34px;min-height:120px}
+
+.pdp-collapsed{display:flex;flex-direction:column;align-items:center;gap:6px}
+.pdp-title{
   font-family:var(--font-mono);font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
-  margin-top:6px;
 }
-.hc-sub{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);margin-top:3px}
-.hc-data{
-  display:inline-block;margin-top:8px;
-  font-family:var(--font-mono);
-  font-size:10px;letter-spacing:.06em;color:var(--ink-soft);
+.pdp-price{font-family:var(--font-mono);font-size:14px;color:var(--ink-soft);margin-top:2px}
+.pdp-plus{
+  margin-top:10px;font-size:20px;line-height:1;color:var(--ink);
+  width:34px;height:34px;border-radius:50%;border:1px solid #ddd;
 }
-.hc-row{
-  display:flex;align-items:center;gap:12px;margin-top:16px;
+.pdp-plus:hover{border-color:var(--ink)}
+
+.pdp-expanded{display:flex;flex-direction:column;align-items:center}
+.pdp-row{
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+  width:100%;max-width:420px;
 }
-.hc-play{
-  font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--ink);border:1px solid #ddd;border-radius:0;
-  padding:8px 12px;
+.pdp-q{
+  justify-self:start;
+  width:26px;height:26px;border-radius:50%;border:1px solid #ddd;
+  font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);
 }
-.hc-play:hover{border-color:var(--ink)}
-.hc-price{font-family:var(--font-mono);font-size:13px;font-weight:600;margin-left:auto}
+.pdp-q:hover{border-color:var(--ink);color:var(--ink)}
+.pdp-status{
+  font-family:var(--font-mono);font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  transition:opacity .15s ease;
+}
+.pdp-status.flash{animation:pdp-flash .5s ease infinite}
+@keyframes pdp-flash{0%,100%{opacity:1}50%{opacity:.25}}
+.pdp-x{justify-self:end;font-size:18px;color:var(--ink-soft)}
+.pdp-x:hover{color:var(--ink)}
+
+.pdp-tiers{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  width:100%;max-width:420px;
+  margin-top:26px;
+}
+.pdp-tier{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.1em;
+  color:var(--ink);padding:10px 4px;position:relative;
+}
+.pdp-tier .tier-price{display:block;font-size:10px;color:var(--ink-soft);margin-top:4px}
+.pdp-tier::after{
+  content:"";position:absolute;left:25%;right:25%;bottom:0;height:1px;
+  background:var(--ink);transform:scaleX(0);transition:transform .15s ease;
+}
+.pdp-tier:hover::after, .pdp-tier.selected::after{transform:scaleX(1)}
+.pdp-tier.selected{font-weight:700}
+
+.pdp-exclusive-btn{
+  margin-top:22px;width:100%;max-width:420px;
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  border:1px solid #ddd;padding:12px;color:var(--ink);
+}
+.pdp-exclusive-btn:hover{border-color:var(--ink)}
+
+.pdp-info-toggle{
+  margin-top:26px;
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-soft);border-bottom:1px solid transparent;padding-bottom:2px;
+}
+.pdp-info-toggle:hover{color:var(--ink);border-color:var(--ink)}
+.pdp-info-panel{
+  margin-top:20px;max-width:420px;text-align:left;
+  font-family:var(--font-mono);font-size:12px;line-height:1.7;color:var(--ink-soft);
+  border-top:1px solid #eee;padding-top:18px;
+}
+.pdp-info-meta{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-bottom:16px;
+}
+.pdp-info-meta div{display:flex;justify-content:space-between;font-size:11px}
+.pdp-info-meta .k{color:var(--ink-soft);letter-spacing:.06em;text-transform:uppercase;font-size:10px}
+.pdp-info-meta .v{color:var(--ink)}
+
+.pdp-buy-btn{margin-top:18px;width:100%;max-width:420px}
+
+@media(max-width:480px){
+  .pdp-body{padding:0 18px 60px}
+}
 
 /* ================= SHOP — minimal, Yeezy-style grid ================= */
 main#shop{max-width:1280px;margin:0 auto;padding:60px 32px 160px}
@@ -182,6 +250,7 @@ main#shop{max-width:1280px;margin:0 auto;padding:60px 32px 160px}
 .tape-card:hover{transform:none;box-shadow:none}
 
 .tc-cover{
+  cursor:pointer;
   aspect-ratio:1/1;border-radius:0;overflow:hidden;
   background:#f4f4f4;margin-bottom:18px;
   position:relative;
@@ -202,14 +271,16 @@ main#shop{max-width:1280px;margin:0 auto;padding:60px 32px 160px}
 .tape-card:hover .tc-play, .tape-card.playing .tc-play{opacity:1}
 .tape-card.playing .tc-play{
   background:
-    radial-gradient(120% 180% at 30% -20%, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 45%),
-    linear-gradient(160deg, #2a2a2a 0%, #060606 55%, #000 100%);
+    linear-gradient(100deg, rgba(255,255,255,0) 30%, rgba(255,255,255,.9) 44%, rgba(255,255,255,0) 58%),
+    radial-gradient(160% 220% at 20% -40%, rgba(255,255,255,.45) 0%, rgba(255,255,255,0) 40%),
+    linear-gradient(175deg, #1a1a1a 0%, #000 50%, #050505 100%);
   color:#fff;border-color:#000;
-  box-shadow:0 1px 0 rgba(255,255,255,.2) inset, 0 4px 10px rgba(0,0,0,.4);
+  box-shadow:0 1px 0 rgba(255,255,255,.3) inset, 0 5px 12px rgba(0,0,0,.5);
 }
 
 .tc-type{font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft)}
-.tc-title{font-family:var(--font-mono);font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-top:6px}
+.tc-title{cursor:pointer;font-family:var(--font-mono);font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-top:6px}
+.tc-title:hover{text-decoration:underline}
 .tc-sub{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);margin-top:3px}
 .tc-data{
   display:inline-block;margin-top:10px;font-size:10px;letter-spacing:.06em;
@@ -225,17 +296,21 @@ main#shop{max-width:1280px;margin:0 auto;padding:60px 32px 160px}
   position:relative;
   overflow:hidden;
   display:inline-block;
+  border:none;cursor:pointer;
   background:
-    radial-gradient(120% 180% at 30% -30%, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 40%),
-    linear-gradient(160deg, #2a2a2a 0%, #060606 55%, #000 100%);
+    linear-gradient(100deg, rgba(255,255,255,0) 30%, rgba(255,255,255,.95) 44%, rgba(255,255,255,.15) 50%, rgba(255,255,255,0) 58%),
+    radial-gradient(160% 220% at 20% -60%, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 35%),
+    linear-gradient(175deg, #1a1a1a 0%, #000 40%, #000 60%, #050505 100%);
   color:#fff;
   font-family:var(--font-mono);
   font-weight:500;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
-  padding:9px 20px;border-radius:3px;
+  padding:9px 20px;border-radius:4px;
   box-shadow:
-    0 1px 0 rgba(255,255,255,.18) inset,
-    0 -6px 10px rgba(255,255,255,.08) inset,
-    0 6px 14px rgba(0,0,0,.45);
+    0 1px 0 rgba(255,255,255,.35) inset,
+    0 -8px 14px rgba(255,255,255,.05) inset,
+    0 1px 0 rgba(0,0,0,.6),
+    0 8px 18px rgba(0,0,0,.55);
+  text-shadow:0 1px 2px rgba(0,0,0,.6);
   transition:transform .1s ease, box-shadow .15s ease, filter .15s ease;
 }
 .buy-btn::after{
