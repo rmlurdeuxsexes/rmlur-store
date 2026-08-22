@@ -7,57 +7,63 @@
 <meta name="description" content="RMLUR Deux Sexes — buy beats and drum kits direct. No middleman.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ================= FACEPLATE HEADER ================= -->
-<header class="faceplate">
-  <div class="faceplate-inner">
-    <div class="brand-block">
-      <div class="brand-badge">RMLUR</div>
-      <div class="brand-sub">deux SEXES</div>
-    </div>
+<!-- tiny corner nav, unobtrusive so the hero reads exactly like before -->
+<div class="corner-nav">
+  <a href="mailto:jayrewindbeatz@gmail.com">CONTACT</a>
+  <a href="https://www.youtube.com/" target="_blank" rel="noopener">YOUTUBE</a>
+  <a href="https://www.instagram.com/kennethglamour/" target="_blank" rel="noopener">IG</a>
+</div>
 
-    <!-- LCD -->
-    <div class="lcd" aria-hidden="false">
-      <div class="lcd-row lcd-scroll"><span id="lcd-marquee">RMLUR DEUX SEXES ▪ BEATS + KITS DIRECT ▪ NO MIDDLEMAN ▪ INSTANT DELIVERY ▪ </span></div>
-      <div class="lcd-row lcd-status">
-        <span id="lcd-now">READY.</span>
-        <span id="lcd-time">00:00</span>
-      </div>
-    </div>
+<!-- ================= HERO — the real photo, untouched ================= -->
+<section class="hero">
+  <div class="hero-frame" id="hero-frame">
+    <img src="assets/mpc-hero.jpg" alt="RMLUR MPC2000XL — buy beats here" id="hero-img">
+    <!-- hotspots are positioned by app.js using window.HERO_HOTSPOTS -->
+    <div id="hero-hotspots"></div>
+  </div>
+  <a href="#shop" class="scroll-cue" aria-label="Scroll to shop">↓ shop the catalog</a>
+</section>
 
-    <div class="header-right">
-      <a class="hard-link" href="mailto:jayrewindbeatz@gmail.com">CONTACT</a>
-      <a class="hard-link" href="https://www.youtube.com/" target="_blank" rel="noopener">YOUTUBE</a>
-      <a class="hard-link" href="https://www.instagram.com/kennethglamour/" target="_blank" rel="noopener">IG</a>
-    </div>
+<!-- popover shown when a hotspot is tapped -->
+<div id="hotspot-card" class="hotspot-card" hidden>
+  <button class="hc-close" id="hc-close" aria-label="Close">×</button>
+  <div class="hc-type" id="hc-type"></div>
+  <div class="hc-title" id="hc-title"></div>
+  <div class="hc-sub" id="hc-sub"></div>
+  <div class="hc-data" id="hc-data"></div>
+  <div class="hc-row">
+    <button class="hc-play" id="hc-play">► preview</button>
+    <span class="hc-price" id="hc-price"></span>
+    <a class="buy-btn" id="hc-buy" href="#" target="_blank" rel="noopener">BUY</a>
+  </div>
+</div>
+
+<!-- ================= SHOP — full catalog, tape-label styled ================= -->
+<main id="shop">
+  <div class="shop-head">
+    <h1>the catalog</h1>
+    <nav class="tabs" aria-label="Filter products">
+      <button class="tab active" data-filter="all">all</button>
+      <button class="tab" data-filter="beat">beats</button>
+      <button class="tab" data-filter="kit">kits</button>
+      <a class="tab tab-link" href="mailto:jayrewindbeatz@gmail.com?subject=Custom%20work">custom</a>
+    </nav>
   </div>
 
-  <!-- F-KEY FILTER ROW -->
-  <nav class="fkeys" aria-label="Filter products">
-    <button class="fkey active" data-filter="all"><span class="fkey-label">F1</span>ALL</button>
-    <button class="fkey" data-filter="beat"><span class="fkey-label">F2</span>BEATS</button>
-    <button class="fkey" data-filter="kit"><span class="fkey-label">F3</span>KITS</button>
-    <a class="fkey fkey-link" href="mailto:jayrewindbeatz@gmail.com?subject=Custom%20work"><span class="fkey-label">F4</span>CUSTOM</a>
-  </nav>
-</header>
-
-<!-- ================= PAD GRID ================= -->
-<main>
-  <section class="grid-wrap">
-    <div id="pad-grid" class="pad-grid"><!-- products injected here --></div>
-    <p id="empty-state" class="empty-state" hidden>NO FILES IN BANK. LOAD SOUND?</p>
-  </section>
+  <div id="tape-grid" class="tape-grid"></div>
+  <p id="empty-state" class="empty-state" hidden>nothing here yet.</p>
 </main>
 
-<!-- ================= TRANSPORT / PLAYER BAR ================= -->
+<!-- ================= PLAYER BAR ================= -->
 <div id="player-bar" class="player-bar" hidden>
   <button id="pb-play" class="transport-btn" aria-label="Play or pause preview">►</button>
   <button id="pb-stop" class="transport-btn" aria-label="Stop preview">■</button>
-  <div class="pb-lcd">
+  <div class="pb-info">
     <span id="pb-title">—</span>
     <div class="pb-meter"><div id="pb-progress"></div></div>
   </div>
@@ -66,8 +72,8 @@
 
 <footer class="site-footer">
   <span>𝄃𝄃𝄂𝄂𝄀𝄁𝄃𝄂𝄂𝄃</span>
-  <span>© RMLUR — all sales final ▪ files delivered instantly after checkout</span>
-  <span>email :: jayrewindbeatz@gmail.com</span>
+  <span>all sales final ▪ files delivered instantly after checkout</span>
+  <span>jayrewindbeatz@gmail.com</span>
 </footer>
 
 <audio id="preview-audio"></audio>
