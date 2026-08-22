@@ -62,17 +62,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!waveCtx) return;
     const w = pbWave.width, h = pbWave.height;
     waveCtx.clearRect(0, 0, w, h);
-    if (analyser && !audio.paused) {
+    let hasSignal = false;
+    if (analyser) {
       analyser.getByteFrequencyData(waveData);
+      for (let i = 0; i < waveData.length; i++) { if (waveData[i] > 2) { hasSignal = true; break; } }
     }
     const bars = 16;
     const gap = 2;
     const barW = Math.floor((w - gap * (bars - 1)) / bars);
+    const t = performance.now() / 400;
     for (let i = 0; i < bars; i++) {
-      let v = 6;
-      if (analyser && !audio.paused) {
+      let v;
+      if (hasSignal) {
         const idx = Math.floor((i / bars) * waveData.length);
         v = Math.max(3, Math.round((waveData[idx] / 255) * h));
+      } else {
+        // idle "breathing" animation so the LCD reads as alive before real audio data exists
+        v = Math.max(3, Math.round(5 + Math.sin(t + i * 0.6) * 4));
       }
       const x = i * (barW + gap);
       const y = h - v;
@@ -182,8 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.tape-card').forEach(el => {
       el.classList.toggle('playing', el.dataset.id === currentId && !audio.paused);
     });
-    playerBar.classList.toggle('paused', audio.paused);
-    if (audio.paused) stopWave();
+    if (waveCtx) { /* keep the LCD alive regardless of actual audio load state */ }
     syncHcPlayLabel();
   }
 
@@ -196,6 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
       pbTitle.textContent = `${p.title} — ${p.subtitle || (p.type === 'kit' ? 'drum kit' : 'beat')}`;
       pbBuy.href = p.stripeLink;
       playerBar.hidden = false;
+      startWave();
       await safePlay(p.preview);
     }
     markPlaying();
